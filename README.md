@@ -1,5 +1,5 @@
 # 🌌 Cosmic Data Analyzer
-
+https://cosmicdataanalyzer.replit.app/
 A sophisticated AI-powered data analysis platform that transforms complex datasets into actionable insights through advanced machine learning techniques, visualization, and intelligent recommendations.
 
 ![Cosmic Data Analyzer](https://i.imgur.com/your-project-screenshot.png)
