@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container py-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body py-5">
+                    <h1 class="display-1 text-danger mb-4">403</h1>
+                    <i data-feather="alert-triangle" style="width: 64px; height: 64px;" class="text-warning mb-4"></i>
+                    
+                    <h2 class="mb-4">Access Denied</h2>
+                    <p class="lead mb-4">
+                        We couldn't authenticate you. This could be due to an expired session or authentication error.
+                    </p>
+                    
+                    <div class="d-grid gap-3 col-md-6 mx-auto">
+                        <a href="{{ url_for('index') }}" class="btn btn-primary">
+                            <i data-feather="home" class="me-2"></i> Return Home
+                        </a>
+                        <a href="{{ url_for('replit_auth.login') }}" class="btn btn-outline-primary">
+                            <i data-feather="log-in" class="me-2"></i> Log In Again
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

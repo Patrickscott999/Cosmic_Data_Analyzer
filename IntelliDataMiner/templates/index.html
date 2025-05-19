@@ -1,0 +1,924 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-12 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center">
+                    <i data-feather="star" class="me-2"></i>
+                    <h4 class="mb-0">Cosmic Data Analyzer</h4>
+                </div>
+                <div id="dataset-info" class="badge bg-info d-flex align-items-center gap-2" style="display: none !important;">
+                    <i data-feather="file-text" style="width: 14px; height: 14px;"></i>
+                    <span id="dataset-name"></span> - <span id="dataset-rows"></span> rows, <span id="dataset-cols"></span> columns
+                </div>
+            </div>
+            <div class="card-body">
+                <div id="upload-section">
+                    <div class="text-center my-4">
+                        <i data-feather="upload-cloud" style="width: 64px; height: 64px; color: var(--theme-primary);"></i>
+                        <h2 class="mt-3">Data Analysis Platform</h2>
+                        <p class="lead text-muted">Upload your dataset to begin AI-powered analysis</p>
+                    </div>
+                    
+                    <form id="upload-form" class="mb-4 mx-auto" style="max-width: 600px;">
+                        <div class="upload-box p-4 mb-3 border rounded d-flex flex-column align-items-center justify-content-center" 
+                             style="border-style: dashed !important; border-width: 2px !important; background-color: rgba(31, 41, 55, 0.3); cursor: pointer; min-height: 200px;">
+                            <i data-feather="file" style="width: 48px; height: 48px; color: var(--theme-primary);"></i>
+                            <p class="mt-3 mb-1">Drag and drop your file here, or click to browse</p>
+                            <p class="text-muted small">Supports CSV, Excel, or JSON files</p>
+                            <input class="form-control d-none" type="file" id="file-upload" accept=".csv,.xls,.xlsx,.json">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i data-feather="upload"></i> Upload and Analyze
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <div class="row mt-5">
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card p-4 rounded text-center">
+                                <i data-feather="filter" style="width: 36px; height: 36px; color: var(--theme-primary);"></i>
+                                <h5 class="mt-3">Clean & Prepare</h5>
+                                <p class="text-muted">Automatically clean your data, handle missing values, and normalize data types</p>
+                                <!-- Feature Card Stars -->
+                                <div class="star" style="top: 20%; left: 15%;"></div>
+                                <div class="star" style="top: 25%; right: 20%;"></div>
+                                <div class="star" style="bottom: 30%; left: 25%;"></div>
+                                <div class="star" style="bottom: 20%; right: 15%;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card p-4 rounded text-center">
+                                <i data-feather="cpu" style="width: 36px; height: 36px; color: var(--theme-primary);"></i>
+                                <h5 class="mt-3">Predict & Mine</h5>
+                                <p class="text-muted">Train machine learning models and discover patterns with data mining algorithms</p>
+                                <!-- Feature Card Stars -->
+                                <div class="star" style="top: 15%; left: 25%;"></div>
+                                <div class="star" style="top: 30%; right: 15%;"></div>
+                                <div class="star" style="bottom: 25%; left: 20%;"></div>
+                                <div class="star" style="bottom: 15%; right: 25%;"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <div class="feature-card p-4 rounded text-center">
+                                <i data-feather="message-circle" style="width: 36px; height: 36px; color: var(--theme-primary);"></i>
+                                <h5 class="mt-3">AI Insights</h5>
+                                <p class="text-muted">Chat with AI about your data and get advanced analytical insights</p>
+                                <!-- Feature Card Stars -->
+                                <div class="star" style="top: 30%; left: 20%;"></div>
+                                <div class="star" style="top: 20%; right: 25%;"></div>
+                                <div class="star" style="bottom: 15%; left: 15%;"></div>
+                                <div class="star" style="bottom: 25%; right: 20%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="analysis-section" style="display: none;">
+                    <ul class="nav nav-tabs mb-4" id="analysisTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button"
+                                role="tab" aria-controls="data" aria-selected="true">
+                                <i data-feather="table" class="me-1" style="width: 16px; height: 16px;"></i> Data Preview
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="clean-tab" data-bs-toggle="tab" data-bs-target="#clean" type="button"
+                                role="tab" aria-controls="clean" aria-selected="false">
+                                <i data-feather="filter" class="me-1" style="width: 16px; height: 16px;"></i> Clean Data
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ml-tab" data-bs-toggle="tab" data-bs-target="#ml" type="button"
+                                role="tab" aria-controls="ml" aria-selected="false">
+                                <i data-feather="cpu" class="me-1" style="width: 16px; height: 16px;"></i> ML Models
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="mine-tab" data-bs-toggle="tab" data-bs-target="#mine" type="button"
+                                role="tab" aria-controls="mine" aria-selected="false">
+                                <i data-feather="search" class="me-1" style="width: 16px; height: 16px;"></i> Data Mining
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="visualize-tab" data-bs-toggle="tab" data-bs-target="#visualize" type="button"
+                                role="tab" aria-controls="visualize" aria-selected="false">
+                                <i data-feather="bar-chart-2" class="me-1" style="width: 16px; height: 16px;"></i> Visualize
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="forecast-tab" data-bs-toggle="tab" data-bs-target="#forecast" type="button"
+                                role="tab" aria-controls="forecast" aria-selected="false">
+                                <i data-feather="trending-up" class="me-1" style="width: 16px; height: 16px;"></i> Forecast
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="compare-tab" data-bs-toggle="tab" data-bs-target="#compare" type="button"
+                                role="tab" aria-controls="compare" aria-selected="false">
+                                <i data-feather="git-merge" class="me-1" style="width: 16px; height: 16px;"></i> Compare
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="ai-tab" data-bs-toggle="tab" data-bs-target="#ai" type="button"
+                                role="tab" aria-controls="ai" aria-selected="false">
+                                <i data-feather="zap" class="me-1" style="width: 16px; height: 16px;"></i> AI Insights
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="nlquery-tab" data-bs-toggle="tab" data-bs-target="#nlquery" type="button"
+                                role="tab" aria-controls="nlquery" aria-selected="false">
+                                <i data-feather="terminal" class="me-1" style="width: 16px; height: 16px;"></i> Ask Data
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="analysisTabsContent">
+                        <!-- Data Preview Tab -->
+                        <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="data-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h4><i data-feather="table" class="me-2"></i> Data Preview</h4>
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-outline-secondary" onclick="loadDataPreview()">
+                                        <i data-feather="refresh-cw"></i> Refresh
+                                    </button>
+                                    <div class="dropdown ms-2">
+                                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="exportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i data-feather="download"></i> Export
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exportDropdown">
+                                            <li><h6 class="dropdown-header">Current Data</h6></li>
+                                            <li><a class="dropdown-item" href="/export?format=csv" id="export-csv"><i data-feather="file-text" class="me-2"></i>Export as CSV</a></li>
+                                            <li><a class="dropdown-item" href="/export?format=excel" id="export-excel"><i data-feather="file" class="me-2"></i>Export as Excel</a></li>
+                                            <li><a class="dropdown-item" href="/export?format=json" id="export-json"><i data-feather="code" class="me-2"></i>Export as JSON</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header">Cleaned Data</h6></li>
+                                            <li><a class="dropdown-item" href="/export?format=csv&type=clean" id="export-clean-csv"><i data-feather="check-circle" class="me-2"></i>Export Clean CSV</a></li>
+                                            <li><a class="dropdown-item" href="/export?format=excel&type=clean" id="export-clean-excel"><i data-feather="check-circle" class="me-2"></i>Export Clean Excel</a></li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li><h6 class="dropdown-header">Original Data</h6></li>
+                                            <li><a class="dropdown-item" href="/export?format=csv&type=original" id="export-original-csv"><i data-feather="archive" class="me-2"></i>Export Original CSV</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover table-sm" id="data-preview-table">
+                                    <thead>
+                                        <tr id="data-preview-header"></tr>
+                                    </thead>
+                                    <tbody id="data-preview-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Clean Data Tab -->
+                        <div class="tab-pane fade" id="clean" role="tabpanel" aria-labelledby="clean-tab">
+                            <h4 class="d-flex align-items-center mb-3"><i data-feather="filter" class="me-2"></i> Clean Dataset</h4>
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i data-feather="info" class="me-2"></i>
+                                <div>
+                                    Clean your dataset by stripping column names, dropping nulls, normalizing types, and encoding categorical variables.
+                                </div>
+                            </div>
+                            <button id="clean-data-btn" class="btn btn-primary mb-3">
+                                <i data-feather="filter"></i> Clean Data
+                            </button>
+                            <div id="clean-result" class="mt-3"></div>
+                        </div>
+
+                        <!-- ML Models Tab -->
+                        <div class="tab-pane fade" id="ml" role="tabpanel" aria-labelledby="ml-tab">
+                            <h4 class="d-flex align-items-center mb-3"><i data-feather="cpu" class="me-2"></i> Machine Learning Models</h4>
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i data-feather="info" class="me-2"></i>
+                                <div>
+                                    Train a machine learning model on your dataset. The system will automatically detect whether to use regression or classification.
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <form id="ml-form" class="mb-3">
+                                        <div class="mb-3">
+                                            <label for="target-column" class="form-label">Select target column:</label>
+                                            <select class="form-select" id="target-column" required>
+                                                <option value="">Select a column</option>
+                                            </select>
+                                            <div class="form-text">This is the column you want the model to predict</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label for="model-type" class="form-label">Select model type (optional):</label>
+                                            <select class="form-select" id="model-type">
+                                                <option value="">Auto (Compare All Models)</option>
+                                                <optgroup label="Classification Models" id="classification-models">
+                                                    <option value="Logistic Regression">Logistic Regression</option>
+                                                    <option value="Random Forest">Random Forest</option>
+                                                    <option value="Gradient Boosting">Gradient Boosting</option>
+                                                    <option value="SVM">Support Vector Machine</option>
+                                                    <option value="KNN">K-Nearest Neighbors</option>
+                                                    <option value="Decision Tree">Decision Tree</option>
+                                                    <option value="Naive Bayes">Naive Bayes</option>
+                                                    <option value="AdaBoost">AdaBoost</option>
+                                                    <option value="Ensemble">Ensemble (Voting)</option>
+                                                </optgroup>
+                                                <optgroup label="Regression Models" id="regression-models">
+                                                    <option value="Linear Regression">Linear Regression</option>
+                                                    <option value="Random Forest">Random Forest</option>
+                                                    <option value="Gradient Boosting">Gradient Boosting</option>
+                                                    <option value="SVM">Support Vector Machine</option>
+                                                    <option value="KNN">K-Nearest Neighbors</option>
+                                                    <option value="Decision Tree">Decision Tree</option>
+                                                    <option value="ElasticNet">ElasticNet</option>
+                                                    <option value="Lasso">Lasso</option>
+                                                    <option value="Ridge">Ridge</option>
+                                                    <option value="AdaBoost">AdaBoost</option>
+                                                    <option value="Ensemble">Ensemble (Voting)</option>
+                                                </optgroup>
+                                            </select>
+                                            <div class="form-text">Choose a specific model or let the system compare multiple models</div>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary">
+                                            <i data-feather="cpu"></i> Train Model
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div id="ml-result" class="mt-3">
+                                <!-- Model results will be displayed here -->
+                            </div>
+                            
+                            <div id="model-visualizations" class="mt-4">
+                                <!-- Model visualizations will be displayed here -->
+                            </div>
+                            
+                            <div id="model-comparison" class="mt-4">
+                                <!-- Model comparison will be displayed here -->
+                            </div>
+                            
+                            <div id="model-interpretation" class="mt-4">
+                                <!-- Model interpretation will be displayed here -->
+                            </div>
+                        </div>
+
+                        <!-- Data Mining Tab -->
+                        <div class="tab-pane fade" id="mine" role="tabpanel" aria-labelledby="mine-tab">
+                            <h4 class="d-flex align-items-center mb-3"><i data-feather="search" class="me-2"></i> Data Mining</h4>
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i data-feather="info" class="me-2"></i>
+                                <div>
+                                    Perform data mining tasks to discover patterns and relationships in your dataset.
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <form id="mine-form" class="mb-3">
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Select mining method:</label>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="radio" name="mining-method" id="apriori-method" value="apriori" checked>
+                                                <label class="form-check-label" for="apriori-method">
+                                                    <span class="fw-medium">Apriori (Association Rules)</span>
+                                                    <div class="form-text">Find relationships between items in a dataset (e.g., "customers who buy X also buy Y")</div>
+                                                </label>
+                                            </div>
+                                            <div class="form-check mt-2">
+                                                <input class="form-check-input" type="radio" name="mining-method" id="kmeans-method" value="kmeans">
+                                                <label class="form-check-label" for="kmeans-method">
+                                                    <span class="fw-medium">KMeans Clustering</span>
+                                                    <div class="form-text">Group similar data points together into clusters</div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3 kmeans-only" style="display: none;">
+                                            <label for="clusters" class="form-label">Number of clusters:</label>
+                                            <input type="number" class="form-control" id="clusters" min="2" max="10" value="3">
+                                            <div class="form-text">How many groups to divide your data into</div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label fw-bold">Select columns to include:</label>
+                                            <div id="mining-columns" class="d-flex flex-wrap border rounded p-3" style="background-color: rgba(31, 41, 55, 0.3);"></div>
+                                        </div>
+                                        
+                                        <button type="submit" class="btn btn-primary">
+                                            <i data-feather="search"></i> Mine Data
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div id="mine-result" class="mt-3"></div>
+                        </div>
+
+                        <!-- Visualize Tab -->
+                        <div class="tab-pane fade" id="visualize" role="tabpanel" aria-labelledby="visualize-tab">
+                            <h4 class="d-flex align-items-center mb-3"><i data-feather="bar-chart-2" class="me-2"></i> Data Visualization</h4>
+                            <div class="alert alert-info d-flex align-items-center" role="alert">
+                                <i data-feather="info" class="me-2"></i>
+                                <div>
+                                    Create interactive visualizations to help understand relationships in your data.
+                                </div>
+                            </div>
+                            
+                            <div class="card mb-4">
+                                <div class="card-body">
+                                    <form id="visualize-form" class="mb-3">
+                                        <div class="row mb-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label fw-bold">Visualization type:</label>
+                                                <div class="viz-type-selector d-flex flex-column gap-2">
+                                                    <div class="form-check viz-type-option p-2 border rounded" style="background-color: rgba(31, 41, 55, 0.3);">
+                                                        <input class="form-check-input" type="radio" name="viz-type" id="bar-type" value="bar" checked>
+                                                        <label class="form-check-label d-flex align-items-center" for="bar-type">
+                                                            <i data-feather="bar-chart" class="me-2" style="width: 18px; height: 18px;"></i>
+                                                            <span>Bar Chart</span>
+                                                        </label>
+                                                    </div>
+                                                    
+                                                    <div class="form-check viz-type-option p-2 border rounded" style="background-color: rgba(31, 41, 55, 0.3);">
+                                                        <input class="form-check-input" type="radio" name="viz-type" id="scatter-type" value="scatter">
+                                                        <label class="form-check-label d-flex align-items-center" for="scatter-type">
+                                                            <i data-feather="activity" class="me-2" style="width: 18px; height: 18px;"></i>
+                                                            <span>Scatter Plot</span>
+                                                        </label>
+                                                    </div>
+                                                    
+                                                    <div class="form-check viz-type-option p-2 border rounded" style="background-color: rgba(31, 41, 55, 0.3);">
+                                                        <input class="form-check-input" type="radio" name="viz-type" id="heatmap-type" value="heatmap">
+                                                        <label class="form-check-label d-flex align-items-center" for="heatmap-type">
+                                                            <i data-feather="grid" class="me-2" style="width: 18px; height: 18px;"></i>
+                                                            <span>Correlation Heatmap</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-8">
+                                                <div class="non-heatmap">
+                                                    <div class="mb-3">
+                                                        <label for="x-axis" class="form-label fw-bold">X-Axis:</label>
+                                                        <select class="form-select" id="x-axis" required>
+                                                            <option value="">Select a column</option>
+                                                        </select>
+                                                        <div class="form-text">Independent variable (typically categorical for bar charts)</div>
+                                                    </div>
+                                                    
+                                                    <div class="mb-3">
+                                                        <label for="y-axis" class="form-label fw-bold">Y-Axis:</label>
+                                                        <select class="form-select" id="y-axis" required>
+                                                            <option value="">Select a column</option>
+                                                        </select>
+                                                        <div class="form-text">Dependent variable (typically numeric)</div>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="mb-3 heatmap-only" style="display: none;">
+                                                    <label class="form-label fw-bold">Select numeric columns for heatmap:</label>
+                                                    <div id="heatmap-columns" class="d-flex flex-wrap border rounded p-3" style="background-color: rgba(31, 41, 55, 0.3);"></div>
+                                                    <div class="form-text">Only numeric columns can be included in a correlation heatmap</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i data-feather="bar-chart-2"></i> Generate Visualization
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div id="visualization-container" class="mt-3" style="min-height: 600px; width: 100%;"></div>
+                            
+                            <!-- Visualization Export Options -->
+                            <div id="visualization-export-options" class="mt-3 text-end" style="display: none;">
+                                <div class="btn-group">
+                                    <a href="/export-visualization?format=png" class="btn btn-sm btn-outline-primary" id="export-visualization-png">
+                                        <i data-feather="image"></i> Save as Image
+                                    </a>
+                                    <a href="/export-visualization?format=svg" class="btn btn-sm btn-outline-primary" id="export-visualization-svg">
+                                        <i data-feather="code"></i> Save as SVG
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- AI Insights Tab -->
+                        <div class="tab-pane fade" id="ai" role="tabpanel" aria-labelledby="ai-tab">
+                            <h4 class="d-flex align-items-center mb-3"><i data-feather="zap" class="me-2"></i> AI-powered Insights</h4>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header d-flex align-items-center justify-content-between">
+                                            <div class="d-flex align-items-center">
+                                                <i data-feather="cpu" class="me-2"></i>
+                                                <h5 class="mb-0">Data Insights</h5>
+                                            </div>
+                                            <div class="dropdown" id="insights-export-dropdown" style="display: none;">
+                                                <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="insightsExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                    <i data-feather="save"></i> Save Report
+                                                </button>
+                                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="insightsExportDropdown">
+                                                    <li><a class="dropdown-item" href="/export-insights?format=pdf" id="export-insights-pdf"><i data-feather="file" class="me-2"></i>Save as PDF</a></li>
+                                                    <li><a class="dropdown-item" href="/export-insights?format=text" id="export-insights-text"><i data-feather="file-text" class="me-2"></i>Save as Text</a></li>
+                                                    <li><a class="dropdown-item" href="/export-insights?format=html" id="export-insights-html"><i data-feather="code" class="me-2"></i>Save as HTML</a></li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Get AI-generated insights about your dataset, including suggestions for modeling and visualization.</p>
+                                            <button id="generate-insights-btn" class="btn btn-primary">
+                                                <i data-feather="cpu"></i> Generate Insights
+                                            </button>
+                                            <div id="insights-result" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header d-flex align-items-center">
+                                            <i data-feather="activity" class="me-2"></i>
+                                            <h5 class="mb-0">Anomaly Detection</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Detect outliers and anomalies in your data using advanced AI techniques.</p>
+                                            <form id="anomaly-detection-form" class="mb-3">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <label for="anomaly-method" class="form-label">Detection Method</label>
+                                                        <select class="form-select" id="anomaly-method">
+                                                            <option value="zscore">Z-Score</option>
+                                                            <option value="iqr">IQR (Interquartile Range)</option>
+                                                            <option value="isolation_forest">Isolation Forest</option>
+                                                            <option value="lof">Local Outlier Factor</option>
+                                                            <option value="dbscan">DBSCAN Clustering</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <label for="anomaly-threshold" class="form-label">Threshold</label>
+                                                        <input type="range" class="form-range" id="anomaly-threshold" min="1" max="5" step="0.1" value="3">
+                                                        <div class="d-flex justify-content-between">
+                                                            <small>Less Strict</small>
+                                                            <small id="threshold-value">3.0</small>
+                                                            <small>More Strict</small>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-3">
+                                                    <button type="submit" class="btn btn-primary">
+                                                        <i data-feather="search"></i> Detect Anomalies
+                                                    </button>
+                                                </div>
+                                            </form>
+                                            <div id="anomaly-results" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header d-flex align-items-center">
+                                            <i data-feather="check-circle" class="me-2"></i>
+                                            <h5 class="mb-0">Data Quality Assessment</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>AI-powered evaluation of data quality with specific cleaning recommendations.</p>
+                                            <button id="data-quality-btn" class="btn btn-primary">
+                                                <i data-feather="shield"></i> Assess Data Quality
+                                            </button>
+                                            <div id="quality-results" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <div class="card h-100">
+                                        <div class="card-header d-flex align-items-center">
+                                            <i data-feather="trending-up" class="me-2"></i>
+                                            <h5 class="mb-0">Analysis Recommendations</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p>Get AI recommendations for appropriate analysis approaches and models for your specific dataset.</p>
+                                            <button id="analysis-recommendations-btn" class="btn btn-primary">
+                                                <i data-feather="compass"></i> Get Analysis Recommendations
+                                            </button>
+                                            <div id="recommendations-results" class="mt-3"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="card">
+                                <div class="card-header d-flex align-items-center">
+                                    <i data-feather="message-circle" class="me-2"></i>
+                                    <h5 class="mb-0">Chat with AI Assistant</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div id="chat-messages" class="chat-container mb-3"></div>
+                                    <form id="chat-form" class="d-flex">
+                                        <input type="text" id="chat-input" class="form-control me-2" placeholder="Ask a question about your data...">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i data-feather="send"></i> Send
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <!-- Time Series Forecasting Tab -->
+                            <div class="tab-pane fade" id="forecast" role="tabpanel" aria-labelledby="forecast-tab">
+                                <h4 class="d-flex align-items-center mb-3"><i data-feather="trending-up" class="me-2"></i> Time Series Forecasting</h4>
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex align-items-center">
+                                        <i data-feather="calendar" class="me-2"></i>
+                                        <h5 class="mb-0">Forecast Configuration</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Generate time series forecasts for your temporal data. Select a date/time column and the target variable to predict.</p>
+                                        
+                                        <form id="forecast-form" class="row g-3">
+                                            <div class="col-md-6">
+                                                <label for="date-column" class="form-label">Date/Time Column</label>
+                                                <select class="form-select" id="date-column" required></select>
+                                                <div class="form-text">Select the column containing date or timestamp values</div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label for="target-column" class="form-label">Target Column</label>
+                                                <select class="form-select" id="target-column" required></select>
+                                                <div class="form-text">Select the numeric column you want to forecast</div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label for="forecast-periods" class="form-label">Forecast Periods</label>
+                                                <input type="number" class="form-control" id="forecast-periods" min="1" max="365" value="30">
+                                                <div class="form-text">Number of future periods to forecast</div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <label for="forecast-method" class="form-label">Forecasting Method</label>
+                                                <select class="form-select" id="forecast-method">
+                                                    <option value="auto" selected>Auto-detect</option>
+                                                    <option value="arima">ARIMA</option>
+                                                    <option value="sarima">Seasonal ARIMA</option>
+                                                    <option value="exponential">Exponential Smoothing</option>
+                                                </select>
+                                                <div class="form-text">The algorithm to use for forecasting</div>
+                                            </div>
+                                            
+                                            <div class="col-12">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i data-feather="trending-up"></i> Generate Forecast
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div id="forecast-results" class="card d-none">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Forecast Results</h5>
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" id="forecastExportDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <i data-feather="download"></i> Export
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="forecastExportDropdown">
+                                                <li><a class="dropdown-item" href="/export-forecast?format=csv" id="export-forecast-csv"><i data-feather="file-text" class="me-2"></i>Export Data as CSV</a></li>
+                                                <li><a class="dropdown-item" href="/export-forecast?format=chart" id="export-forecast-chart"><i data-feather="bar-chart-2" class="me-2"></i>Export Chart as Image</a></li>
+                                                <li><a class="dropdown-item" href="/export-forecast?format=report" id="export-forecast-report"><i data-feather="file" class="me-2"></i>Export Full Report</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="card-body">
+                                        <div id="forecast-visualization" class="visualization-container mb-4"></div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h6 class="mb-0">Model Information</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <table class="table table-sm">
+                                                            <tbody id="forecast-model-details"></tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-6">
+                                                <div class="card">
+                                                    <div class="card-header">
+                                                        <h6 class="mb-0">Forecast Values</h6>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="table-responsive">
+                                                            <table class="table table-sm table-striped">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>Date</th>
+                                                                        <th>Forecast</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody id="forecast-values"></tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Dataset Comparison Tab -->
+                            <div class="tab-pane fade" id="compare" role="tabpanel" aria-labelledby="compare-tab">
+                                <h4 class="d-flex align-items-center mb-3"><i data-feather="git-merge" class="me-2"></i> Dataset Comparison</h4>
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex align-items-center">
+                                        <i data-feather="columns" class="me-2"></i>
+                                        <h5 class="mb-0">Compare Datasets</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Compare two datasets to identify differences in structure, content, and statistics.</p>
+                                        
+                                        <div class="alert alert-info d-flex align-items-center" role="alert">
+                                            <i data-feather="info" class="me-2"></i>
+                                            <div>
+                                                To compare datasets, you need to have at least two files uploaded. 
+                                                Each upload creates a new dataset ID that can be selected below.
+                                            </div>
+                                        </div>
+                                        
+                                        <form id="compare-form" class="row g-3">
+                                            <div class="col-md-5">
+                                                <label for="dataset1" class="form-label">Dataset 1</label>
+                                                <select class="form-select" id="dataset1" required>
+                                                    <option value="" selected disabled>Select a dataset</option>
+                                                </select>
+                                                <div class="form-text">Select the first dataset for comparison</div>
+                                                
+                                                <input type="text" class="form-control mt-2" id="dataset1-name" placeholder="Dataset 1 Name (Optional)">
+                                            </div>
+                                            
+                                            <div class="col-md-2 d-flex align-items-center justify-content-center">
+                                                <div class="border rounded-circle p-3 mt-4">
+                                                    <i data-feather="git-merge" style="width: 32px; height: 32px;"></i>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="col-md-5">
+                                                <label for="dataset2" class="form-label">Dataset 2</label>
+                                                <select class="form-select" id="dataset2" required>
+                                                    <option value="" selected disabled>Select a dataset</option>
+                                                </select>
+                                                <div class="form-text">Select the second dataset for comparison</div>
+                                                
+                                                <input type="text" class="form-control mt-2" id="dataset2-name" placeholder="Dataset 2 Name (Optional)">
+                                            </div>
+                                            
+                                            <div class="col-12 mt-4">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i data-feather="git-pull-request"></i> Compare Datasets
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div id="comparison-results" class="card d-none">
+                                    <div class="card-header">
+                                        <h5 class="mb-0">Comparison Results</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <!-- Key Insights -->
+                                        <div class="mb-4">
+                                            <h6 class="card-subtitle mb-2">Key Insights</h6>
+                                            <div id="comparison-insights" class="alert alert-info"></div>
+                                        </div>
+                                        
+                                        <!-- Structure Comparison -->
+                                        <div class="mb-4">
+                                            <h6 class="card-subtitle mb-2">Structure Comparison</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <h6 id="dataset1-heading">Dataset 1</h6>
+                                                            <div id="dataset1-structure"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="card bg-light">
+                                                        <div class="card-body">
+                                                            <h6 id="dataset2-heading">Dataset 2</h6>
+                                                            <div id="dataset2-structure"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Column Comparison -->
+                                        <div class="mb-4">
+                                            <h6 class="card-subtitle mb-2">Column Comparison</h6>
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="card border-success">
+                                                        <div class="card-header bg-success text-white">
+                                                            Common Columns
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <ul id="common-columns" class="list-group list-group-flush"></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card border-primary">
+                                                        <div class="card-header bg-primary text-white">
+                                                            <span id="dataset1-only-heading">Dataset 1 Only</span>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <ul id="dataset1-only-columns" class="list-group list-group-flush"></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="card border-info">
+                                                        <div class="card-header bg-info text-white">
+                                                            <span id="dataset2-only-heading">Dataset 2 Only</span>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <ul id="dataset2-only-columns" class="list-group list-group-flush"></ul>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Statistical Comparison Visualizations -->
+                                        <div class="mb-4">
+                                            <h6 class="card-subtitle mb-2">Distribution Comparison</h6>
+                                            <div id="comparison-charts"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                                
+                            <!-- Natural Language Query Tab -->
+                            <div class="tab-pane fade" id="nlquery" role="tabpanel" aria-labelledby="nlquery-tab">
+                                <h4 class="d-flex align-items-center mb-3"><i data-feather="terminal" class="me-2"></i> Ask Questions About Your Data</h4>
+                                
+                                <div class="card mb-4">
+                                    <div class="card-header d-flex align-items-center">
+                                        <i data-feather="search" class="me-2"></i>
+                                        <h5 class="mb-0">Natural Language Query</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <p>Ask questions about your data in plain English. The AI will generate and run code to answer your questions.</p>
+                                        <div class="alert alert-secondary">
+                                            <strong>Example queries:</strong>
+                                            <ul class="mb-0 mt-1">
+                                                <li>Show me the average values by category</li>
+                                                <li>What's the correlation between price and rating?</li>
+                                                <li>Create a bar chart of sales by region</li>
+                                                <li>Find the top 5 products by revenue</li>
+                                            </ul>
+                                        </div>
+                                        <form id="nlquery-form" class="d-flex">
+                                            <input type="text" id="nlquery-input" class="form-control me-2" 
+                                                placeholder="E.g., Show me the distribution of ages in my data">
+                                            <button type="submit" class="btn btn-primary">
+                                                <i data-feather="search"></i> Query
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                                
+                                <div id="nlquery-results" class="card d-none">
+                                    <div class="card-header d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">Results</h5>
+                                        <button class="btn btn-sm btn-outline-secondary copy-code-btn" data-target="nlquery-code">
+                                            <i data-feather="copy"></i> Copy Code
+                                        </button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-4">
+                                            <h6>Explanation</h6>
+                                            <div id="nlquery-explanation" class="p-3 border rounded bg-light"></div>
+                                        </div>
+                                        
+                                        <div class="mb-4">
+                                            <h6>Generated Code</h6>
+                                            <pre class="bg-dark text-light p-3 rounded code-block"><code id="nlquery-code"></code></pre>
+                                        </div>
+                                        
+                                        <div id="nlquery-visualization-container" class="mb-4 d-none">
+                                            <h6>Visualization</h6>
+                                            <div id="nlquery-visualization" class="visualization-container border rounded p-3"></div>
+                                        </div>
+                                        
+                                        <div>
+                                            <h6>Insights</h6>
+                                            <div id="nlquery-insights" class="p-3 border rounded bg-light"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast notifications -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toast-notification" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header">
+            <i data-feather="bell" class="me-2" style="width: 16px; height: 16px;"></i>
+            <strong class="me-auto" id="toast-title">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body" id="toast-message"></div>
+    </div>
+</div>
+
+<!-- Loading indicator -->
+<div id="loading-overlay" style="display: none;">
+    <div class="spinner-border text-light" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="text-light mt-3">Processing your request...</p>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Make the entire upload box clickable
+    document.addEventListener('DOMContentLoaded', function() {
+        const uploadBox = document.querySelector('.upload-box');
+        const fileInput = document.getElementById('file-upload');
+        
+        if (uploadBox && fileInput) {
+            uploadBox.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            // Show the file name when selected
+            fileInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const fileName = this.files[0].name;
+                    const fileInfo = uploadBox.querySelector('p');
+                    if (fileInfo) {
+                        fileInfo.textContent = `Selected file: ${fileName}`;
+                    }
+                }
+            });
+            
+            // Handle drag and drop
+            uploadBox.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadBox.style.borderColor = 'var(--theme-primary)';
+                uploadBox.style.backgroundColor = 'rgba(99, 102, 241, 0.1)';
+            });
+            
+            uploadBox.addEventListener('dragleave', function() {
+                uploadBox.style.borderColor = '';
+                uploadBox.style.backgroundColor = 'rgba(31, 41, 55, 0.3)';
+            });
+            
+            uploadBox.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadBox.style.borderColor = '';
+                uploadBox.style.backgroundColor = 'rgba(31, 41, 55, 0.3)';
+                
+                if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                    fileInput.files = e.dataTransfer.files;
+                    const fileName = e.dataTransfer.files[0].name;
+                    const fileInfo = uploadBox.querySelector('p');
+                    if (fileInfo) {
+                        fileInfo.textContent = `Selected file: ${fileName}`;
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

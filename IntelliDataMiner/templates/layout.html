@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Data Analyzer</title>
+    <!-- Bootstrap CSS (Replit-themed) -->
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <!-- Feather Icons -->
+    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+    <!-- Google Fonts: Space-Age Font Pairings -->
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@300;400;500;600;700&family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Enhanced Cosmic UI -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cosmic-enhancements.css') }}">
+</head>
+<body class="cosmic-body">
+    <!-- Enhanced Galaxy Theme Animated Background -->
+    <div class="gradient-bg"></div>
+    <div class="stars small-stars"></div>
+    <div class="stars medium-stars"></div>
+    <div class="stars large-stars"></div>
+    <div class="nebula nebula-1"></div>
+    <div class="nebula nebula-2"></div>
+    <div class="nebula nebula-3"></div>
+    <div class="comet"></div>
+    
+    <!-- Enhanced Cosmic Floating Particles -->
+    <div class="cosmic-particles">
+        <div class="particle p1"></div>
+        <div class="particle p2"></div>
+        <div class="particle p3"></div>
+        <div class="particle p4"></div>
+        <div class="particle p5"></div>
+        <div class="particle p6"></div>
+        <div class="particle p7"></div>
+        <div class="particle p8"></div>
+        <div class="particle p9"></div>
+        <div class="particle p10"></div>
+    </div>
+    
+    <!-- Celestial Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark cosmic-navbar">
+        <div class="container">
+            <a class="navbar-brand orbital-element" href="/">
+                <div class="brand-icon">
+                    <i data-feather="star"></i>
+                </div>
+                <span class="brand-text">Cosmic Data Analyzer</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto cosmic-nav">
+                    <li class="nav-item">
+                        <a class="nav-link cosmic-nav-link active" href="/">
+                            <div class="nav-icon">
+                                <i data-feather="home"></i>
+                            </div>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    {% if current_user.is_authenticated %}
+                    <li class="nav-item">
+                        <a class="nav-link cosmic-nav-link" href="{{ url_for('dashboard') }}">
+                            <div class="nav-icon">
+                                <i data-feather="grid"></i>
+                            </div>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="d-flex align-items-center">
+                    <span class="cosmic-badge">
+                        <i data-feather="cpu"></i> 
+                        <span>AI-Powered</span>
+                    </span>
+                    
+                    {% if current_user.is_authenticated %}
+                    <div class="dropdown">
+                        <button class="btn cosmic-btn user-btn" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            {% if current_user.profile_image_url %}
+                            <div class="user-avatar">
+                                <img src="{{ current_user.profile_image_url }}" alt="User">
+                            </div>
+                            {% else %}
+                            <div class="user-avatar">
+                                <i data-feather="user"></i>
+                            </div>
+                            {% endif %}
+                            <span>{{ current_user.first_name or 'User' }}</span>
+                        </button>
+                        <ul class="dropdown-menu cosmic-dropdown" aria-labelledby="userDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard') }}"><i data-feather="grid"></i> Dashboard</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('replit_auth.logout') }}"><i data-feather="log-out"></i> Logout</a></li>
+                        </ul>
+                    </div>
+                    {% else %}
+                    <a href="{{ url_for('replit_auth.login') }}" class="btn cosmic-btn login-btn">
+                        <i data-feather="log-in"></i>
+                        <span>Login</span>
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Warp Drive Transition -->
+    <div class="warp-transition">
+        <div class="warp-lines"></div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <main class="container cosmic-container my-5">
+        <div class="nav-constellation">
+            <div class="constellation-line c1"></div>
+            <div class="constellation-line c2"></div>
+            <div class="constellation-line c3"></div>
+            <div class="constellation-node n1"></div>
+            <div class="constellation-node n2"></div>
+            <div class="constellation-node n3"></div>
+        </div>
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Cosmic Footer -->
+    <footer class="footer mt-auto py-3 text-center cosmic-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-icon">
+                    <i data-feather="star"></i>
+                </div>
+                <span class="footer-text">
+                    Cosmic Data Analyzer - Exploring the Universe of Data
+                </span>
+                <div class="footer-orbit-path"></div>
+            </div>
+            <div class="cosmic-footer-stars mt-2"></div>
+        </div>
+    </footer>
+    
+    <!-- Enhanced Stellar Toast Notification -->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="toast-notification" class="toast cosmic-toast align-items-center border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-inner">
+                <div class="toast-icon-container cosmic-toast-icon">
+                    <i id="toast-icon" data-feather="info"></i>
+                    <div class="cosmic-toast-glow"></div>
+                </div>
+                <div class="toast-body">
+                    <div class="toast-content">
+                        <h6 id="toast-title" class="mb-0">Notification</h6>
+                        <span id="toast-message">This is a toast message</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close cosmic-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <!-- Sparkling stars for success notifications -->
+            <div class="toast-sparkles">
+                <div class="sparkle s1"></div>
+                <div class="sparkle s2"></div>
+                <div class="sparkle s3"></div>
+                <div class="sparkle s4"></div>
+                <div class="sparkle s5"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Wormhole Loading Animation -->
+    <div id="loading-overlay" style="display: none;">
+        <div class="wormhole-container">
+            <div class="wormhole-outer">
+                <div class="wormhole-middle">
+                    <div class="wormhole-inner">
+                        <div class="wormhole-core"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="wormhole-particles">
+                <div class="wormhole-particle wp1"></div>
+                <div class="wormhole-particle wp2"></div>
+                <div class="wormhole-particle wp3"></div>
+                <div class="wormhole-particle wp4"></div>
+                <div class="wormhole-particle wp5"></div>
+                <div class="wormhole-particle wp6"></div>
+            </div>
+            <div class="loading-message">Traversing Wormhole...</div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Export libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='favicon.ico') }}">
+    
+    <!-- Initialize Feather Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            feather.replace();
+            
+            // Add cursor trail effect
+            document.addEventListener('mousemove', createCosmicDust);
+            
+            function createCosmicDust(e) {
+                const body = document.querySelector('body');
+                const particle = document.createElement('div');
+                particle.className = 'cursor-particle';
+                
+                // Position particle at cursor
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                
+                // Add to DOM
+                body.appendChild(particle);
+                
+                // Remove particle after animation completes
+                setTimeout(() => {
+                    particle.remove();
+                }, 1500);
+            }
+        });
+    </script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
